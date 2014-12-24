@@ -30,6 +30,10 @@ static this()
 	registerCompiler(new LdcCompiler);
 }
 
+bool canFindCompiler(string name) {
+  // TODO: how to check whether executable exists on Windows?
+  return executeShell("which " ~ name).status == 0;
+}
 
 Compiler getCompiler(string name)
 {

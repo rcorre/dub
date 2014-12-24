@@ -357,9 +357,9 @@ abstract class PackageBuildCommand : Command {
 		string m_buildType;
 		BuildMode m_buildMode;
 		string m_buildConfig;
-		string m_compilerName = initialCompilerBinary;
 		string m_arch;
 		string[] m_debugVersions;
+    string m_compilerName = initialCompilerBinary;
 		Compiler m_compiler;
 		BuildPlatform m_buildPlatform;
 		BuildSettings m_buildSettings;
@@ -367,6 +367,19 @@ abstract class PackageBuildCommand : Command {
 		bool m_nodeps;
 		bool m_forceRemove = false;
 	}
+
+  this() 
+  {
+    // if initialCompilerBinary cannot be found on system, try to find another
+    if (!canFindCompiler(m_compilerName)) {
+      enum toTry = [ "dmd", "ldc", "gdc" ];
+      foreach(name ; toTry) {
+        if (canFindCompiler(name)) {
+          m_compilerName = name;
+        }
+      }
+    }
+  }
 
 	override void prepare(scope CommandArgs args)
 	{
@@ -498,6 +511,7 @@ class GenerateCommand : PackageBuildCommand {
 
 	this()
 	{
+    super();
 		this.name = "generate";
 		this.argumentsPattern = "<generator> [<package>]";
 		this.description = "Generates project files using the specified generator";
@@ -652,6 +666,7 @@ class TestCommand : PackageBuildCommand {
 
 	this()
 	{
+    super();
 		this.name = "test";
 		this.argumentsPattern = "[<package>]";
 		this.description = "Executes the tests of the selected package";
@@ -726,6 +741,7 @@ class TestCommand : PackageBuildCommand {
 class DescribeCommand : PackageBuildCommand {
 	this()
 	{
+    super();
 		this.name = "describe";
 		this.argumentsPattern = "[<package>]";
 		this.description = "Prints a JSON description of the project and its dependencies";
@@ -1283,6 +1299,7 @@ class DustmiteCommand : PackageBuildCommand {
 
 	this()
 	{
+    super();
 		this.name = "dustmite";
 		this.argumentsPattern = "<destination-path>";
 		this.acceptsAppArgs = true;
